@@ -18,6 +18,9 @@ from evaluate_model import evaluate_model
 import scipy.io as sio
 import time
 import global_models as gm
+from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, cohen_kappa_score
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def load_net(fname, net):
@@ -65,8 +68,9 @@ def model_test(nIndex, model_name, test_loader):
     alable = []
     count = 0
     total = 0
-
-    for blob in test_loader:
+    all_loader_length = len(test_loader)
+    for i, blob in enumerate(test_loader):
+        print("正在处理第 %d 个batch， 共 %d 个" % (i, all_loader_length))
         im_data = blob[0]
         dem_data = blob[2]
         img_data = blob[1]
@@ -87,11 +91,19 @@ def model_test(nIndex, model_name, test_loader):
 
     # end=time.clock()
     # print (end-start)/300
-    a = np.array(alable)
-    b = np.array(aprelable)
-    b = b.reshape(1, b.shape[0])
-    a = a.reshape(1, a.shape[0])
-    result = np.concatenate((a, b), axis=0);
+    label_true = np.array(alable)
+    label_pred = np.array(aprelable)
+    # label_pred = label_pred.reshape(1, label_pred.shape[0])
+    # label_true = label_true.reshape(1, label_true.shape[0])
+    print('原始label：' + str(label_true))
+    print('预测label：' + str(label_pred))
+    result = np.concatenate((label_true, label_pred), axis=0)
+    matrix = confusion_matrix(label_true, label_pred)
+    print("混淆矩阵：")
+    print(matrix)
+    print("sklearn计算的准确率：" + str(accuracy_score(label_true, label_pred)))
+    print("F1-score：" + str(f1_score(label_true, label_pred, average='weighted')))
+    print("kappa系数：" + str(cohen_kappa_score(label_true, label_pred)))
 
     accu = int(10000.0 * count / total) / 100.0
 
@@ -102,6 +114,9 @@ def model_test(nIndex, model_name, test_loader):
     # np.save(model_path, result)
 
     print('Accuracy:', accu)
+
+    # sns.heatmap(matrix, annot=True)
+    # plt.show()
 
 
 if __name__ == '__main__':
