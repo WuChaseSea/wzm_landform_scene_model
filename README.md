@@ -31,6 +31,8 @@ VggNet、GoogLeNet、InceptionV2、InceptionV3、InceptionV4、ResNet、DenseNet
 
 支持预训练的模型只有VggNet、GoogLeNet、InceptionV3、ResNet、DenseNet
 
+已经实现的网络都支持使用spp结构
+
 在使用预训练模型时，需要自行从网络上下载pth文件，放到pth文件夹里（其中，googlenet文件较小可以上传到GitHub上，其他的几个pth文件较大上传到GitHub上比较麻烦还没实现，下面给了几个pth文件的下载地址）
 
 VggNet: 
@@ -94,19 +96,15 @@ model_urls = {
 python achieve.py  后面需要加参数
 
 - -train_path  训练集所在路径
-
 - -valid_path  验证集所在路径
-
 - -train_txt  训练集标签文件（该txt文件放在训练集里面，并且只要txt的文件名），默认train.txt
-
 - -valid_txt  验证集标签文件（该txt文件放在验证集里面，并且只要txt的文件名），默认valid.txt
-
 - -dataloader  需要加载的数据集格式，目前有ouy_dataloader和zism_dataloader两种格式，默认是zism_dataloader
 - -model 选择的模型文件，目前有Triple、VggNet、GoogLeNet、InceptionV2、InceptionV3、InceptionV4和ResNet34，默认ResNet34
 - -pretrained 是否需要使用预训练模型
+- -use_spp 是否使用spp结构，默认False不使用
 - -train_batchsize  训练时批处理的数目，默认1
 - -valid_batchsize  验证时批处理的数目，默认1
-
 - -epoches 迭代数，默认100
 
 ## 测试

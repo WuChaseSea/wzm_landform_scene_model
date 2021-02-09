@@ -15,6 +15,7 @@ import global_models as gm
 
 
 def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, dataloader, index, pretrained,
+          use_spp,
           train_batch_size,
           valid_batch_size, epoches, save_epoch=5, valid_epoch=2):
     # print(torch.cuda.get_device_name(0))
@@ -62,7 +63,7 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
     # elif index == 'ResNet34':
     #     print('Using ResNet34...')
     print('Using ' + gm.get_value(index) + '...')
-    net = Network(index=index)
+    net = Network(index=index, use_spp=use_spp)
     device = torch.device('cuda:0')
     if torch.cuda.is_available():
         net = net.to(device)

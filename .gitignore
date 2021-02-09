@@ -131,6 +131,8 @@ dmypy.json
 # 忽略模型保存文件
 model_*_save/
 model_save/
+model_save_not_pre/
+data/
 
 pth/
 

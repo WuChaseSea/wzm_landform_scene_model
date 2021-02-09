@@ -18,32 +18,32 @@ from models.ouy.ouy_densenet_model_pretrained import DenseNet121
 
 
 class Network(nn.Module):
-    def __init__(self, index):
+    def __init__(self, index, use_spp=False):
         super(Network, self).__init__()
         self.index = index
         if index == 'Triple':
-            self.Models = TripleModels()
+            self.Models = TripleModels(use_spp=use_spp)
             # print('Using TripleModels')
         elif index == 'VggNet':
-            self.Models = VggModel()
+            self.Models = VggModel(use_spp=use_spp)
             # print('Using VggModel')
         elif index == 'GoogLeNet':
-            self.Models = InceptionV1()
+            self.Models = InceptionV1(use_spp=use_spp)
             # print('Using GoogLeNetModel')
         elif index == 'InceptionV2':
-            self.Models = InceptionV2()
+            self.Models = InceptionV2(use_spp=use_spp)
             # print('Using InceptionV2')
         elif index == 'InceptionV3':
-            self.Models = InceptionV3()
+            self.Models = InceptionV3(use_spp=use_spp)
             # print('Using InceptionV3')
         elif index == 'InceptionV4':
-            self.Models = InceptionV4()
+            self.Models = InceptionV4(use_spp=use_spp)
             # print('Using InceptionV4')
         elif index == 'ResNet34':
-            self.Models = ResNet34()
+            self.Models = ResNet34(use_spp=use_spp)
             # print('Using ResNet34Model')
         elif index == 'DenseNet121':
-            self.Models = DenseNet121()
+            self.Models = DenseNet121(use_spp=use_spp)
             # print('Using DenseNet121')
         self.softmax = nn.LogSoftmax()
         self.loss_softmax = to_cuda(nn.CrossEntropyLoss())

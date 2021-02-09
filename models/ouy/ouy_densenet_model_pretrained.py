@@ -9,9 +9,11 @@ import torch.nn as nn
 import torch
 import torchvision.models as models
 
+from models.spp_net import SpatialPyramidPooling2d
+
 
 class DenseNet121(nn.Module):
-    def __init__(self, num_classes=3):
+    def __init__(self, num_classes=3, num_level=3, pool_type='max_pool', use_spp=False):
         super(DenseNet121, self).__init__()
         self.densenet = models.densenet121(pretrained=False)
         del self.densenet.classifier
@@ -63,6 +65,28 @@ class DenseNet121(nn.Module):
             nn.Linear(256, num_classes),
         )
 
+        self.use_spp = use_spp
+        self.num_level = num_level
+        self.pool_type = pool_type
+        self.num_grid = self._cal_num_grids(num_level)
+        self.spp_layer = SpatialPyramidPooling2d(num_level)
+
+        self.classifier_spp = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(64 * self.num_grid, 512),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(512, 256),
+            nn.ReLU(inplace=True),
+            nn.Linear(256, num_classes),
+        )
+
+    def _cal_num_grids(self, level):
+        count = 0
+        for i in range(level):
+            count += (i + 1) * (i + 1)
+        return count
+
     def forward_3(self, x):
         out = self.densenet.features(x)
         return out
@@ -102,9 +126,14 @@ class DenseNet121(nn.Module):
         h = self.relu1_fusion(h)
         h = self.conv_fusion(h)
         # print(h.shape)
-        h = h.view(h.size(0), -1)
+        if not self.use_spp:  # 如果use_spp为False
+            h = h.view(h.size(0), -1)  # [16, 576]
 
-        h = self.classifier(h)
+            h = self.classifier(h)  # [16, 3]
+        else:
+            h = self.spp_layer(h)
+
+            h = self.classifier_spp(h)
         return h
 
 

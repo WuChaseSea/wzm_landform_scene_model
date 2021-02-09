@@ -9,6 +9,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from models.spp_net import SpatialPyramidPooling2d
+
 
 # 用于ResNet18和34的残差块，用的是2个3x3的卷积
 class BasicBlock(nn.Module):
@@ -126,7 +128,7 @@ def ResNet18():
 
 
 class ResNet34(nn.Module):
-    def __init__(self, num_classes=3):
+    def __init__(self, num_classes=3, num_level=3, pool_type='max_pool', use_spp=False):
         super(ResNet34, self).__init__()
         self.net = ResNet(BasicBlock, [3, 4, 6, 3])
         # print(self.net)
@@ -156,6 +158,28 @@ class ResNet34(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(256, num_classes),
         )
+
+        self.use_spp = use_spp
+        self.num_level = num_level
+        self.pool_type = pool_type
+        self.num_grid = self._cal_num_grids(num_level)
+        self.spp_layer = SpatialPyramidPooling2d(num_level)
+
+        self.classifier_spp = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(64 * self.num_grid, 512),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(512, 256),
+            nn.ReLU(inplace=True),
+            nn.Linear(256, num_classes),
+        )
+
+    def _cal_num_grids(self, level):
+        count = 0
+        for i in range(level):
+            count += (i + 1) * (i + 1)
+        return count
 
     def forward(self, x1, x2, x3, IsUseRGB=1):
         """
@@ -188,9 +212,14 @@ class ResNet34(nn.Module):
         h = self.relu1_fusion(h)
         h = self.conv_fusion(h)
         # print(h.shape)
-        h = h.view(h.size(0), -1)
+        if not self.use_spp:  # 如果use_spp为False
+            h = h.view(h.size(0), -1)  # [16, 576]
 
-        h = self.classifier(h)
+            h = self.classifier(h)  # [16, 3]
+        else:
+            h = self.spp_layer(h)
+
+            h = self.classifier_spp(h)
         return h
 
 
