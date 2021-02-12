@@ -168,20 +168,21 @@ class InceptionV1(nn.Module):
         # self.linear = nn.Linear(in_features=1024, out_features=num_classes)
 
         self.use_spp = use_spp
-        self.num_level = num_level
-        self.pool_type = pool_type
-        self.num_grid = self._cal_num_grids(num_level)
-        self.spp_layer = SpatialPyramidPooling2d(num_level)
+        if use_spp:
+            self.num_level = num_level
+            self.pool_type = pool_type
+            self.num_grid = self._cal_num_grids(num_level)
+            self.spp_layer = SpatialPyramidPooling2d(num_level)
 
-        self.classifier_spp = nn.Sequential(
-            nn.Dropout(),
-            nn.Linear(64 * self.num_grid, 512),
-            nn.ReLU(inplace=True),
-            nn.Dropout(),
-            nn.Linear(512, 256),
-            nn.ReLU(inplace=True),
-            nn.Linear(256, num_classes),
-        )
+            self.classifier_spp = nn.Sequential(
+                nn.Dropout(),
+                nn.Linear(64 * self.num_grid, 512),
+                nn.ReLU(inplace=True),
+                nn.Dropout(),
+                nn.Linear(512, 256),
+                nn.ReLU(inplace=True),
+                nn.Linear(256, num_classes),
+            )
 
     def _cal_num_grids(self, level):
         count = 0

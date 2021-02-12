@@ -13,7 +13,7 @@ import torch
 import argparse
 from model_timer import Timer
 
-from net.ouy_net import Network
+# from net.ouy_net import Network
 from evaluate_model import evaluate_model
 import scipy.io as sio
 import time
@@ -39,6 +39,9 @@ def get_args():
     parser.add_argument("-test_txt", help="test txt file", type=str, default="test.txt")
 
     parser.add_argument("-model", help="model", type=str, default="ResNet34")
+    parser.add_argument("-pretrained", help="whether use pretrained model", type=str, default='False')
+
+    parser.add_argument("-use_spp", help="whether use spp", type=str, default='False')
 
     parser.add_argument("-best_name", help="best name", type=str)
 
@@ -49,8 +52,13 @@ def get_args():
     return parser.parse_args()
 
 
-def model_test(nIndex, model_name, test_loader):
+def model_test(nIndex, model_name, test_loader, pretrained):
     # test_model.model_test(61, best_modelName, test_loader)
+
+    if pretrained:
+        from net.ouy_net_pretrained import Network
+    else:
+        from net.ouy_net import Network
 
     path = "./model_save/model_" + nIndex + "_save/"
     model_path = path + model_name
@@ -125,6 +133,10 @@ if __name__ == '__main__':
     test_path = args.test_path
     test_name = args.test_txt
     nIndex = args.model
+    pretrained = args.pretrained
+    pretrained = True if pretrained == 'True' else False
+    use_spp = args.use_spp
+    use_spp = True if use_spp == 'True' else False
     best_name = args.best_name
     test_batchsize = args.test_batchsize
     dataloader = args.dataloader
@@ -136,4 +148,4 @@ if __name__ == '__main__':
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=test_batchsize, pin_memory=True,
                                               num_workers=8)
 
-    model_test(nIndex, best_name, test_loader)
+    model_test(nIndex, best_name, test_loader, pretrained)
