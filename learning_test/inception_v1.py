@@ -140,10 +140,10 @@ class InceptionV1(nn.Module):
         # aux2 = x = self.block4_2(x)
         x = self.block4_3(x)
         out = self.block5(x)
-        out = self.avgpool(out)
-        out = self.dropout(out)
-        out = out.view(out.size(0), -1)
-        out = self.linear(out)
+        # out = self.avgpool(out)
+        # out = self.dropout(out)
+        # out = out.view(out.size(0), -1)
+        # out = self.linear(out)
         return out
         # if self.stage == 'train':
         #     aux1 = self.aux_logits1(aux1)
@@ -154,19 +154,19 @@ class InceptionV1(nn.Module):
 
 
 if __name__ == '__main__':
-    # model = InceptionV1()
-    model = torchvision.models.googlenet(pretrained=False)
-    y = nn.Sequential()
-    for x in model._modules.keys():
-        print(model.x)
-        # y.add_module(x, model[x])
-    # print(y)
-    pre = torch.load('../pth/googlenet-1378be20.pth')
-    model.load_state_dict(pre)
-    # print(model)
+    # model = torchvision.models.googlenet(pretrained=False)
+    # y = nn.Sequential()
+    # for x in model._modules.keys():
+    #     print(model.x)
+    #     # y.add_module(x, model[x])
+    # # print(y)
+    # pre = torch.load('../pth/googlenet-1378be20.pth')
+    # model.load_state_dict(pre)
+    # # print(model)
 
-    # input = torch.randn(16, 3, 512, 512)
-    # out = model(input)
-    # # print(aux1.shape)
-    # # print(aux2.shape)
-    # print(out.shape)
+    model = InceptionV1()
+    input = torch.randn(16, 3, 64, 64)
+    out = model(input)
+    # print(aux2.shape)
+    # print(aux1.shape)
+    print(out.shape)

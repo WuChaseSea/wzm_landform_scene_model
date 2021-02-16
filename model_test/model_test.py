@@ -49,10 +49,12 @@ def get_args():
 
     parser.add_argument("-test_batchsize", help="test batchsize", type=int, default=8)
 
+    parser.add_argument("-draw", help="whether draw pic", type=str, default='False')
+
     return parser.parse_args()
 
 
-def model_test(nIndex, model_name, test_loader, pretrained):
+def model_test(nIndex, model_name, test_loader, pretrained, use_spp, draw_pic=False):
     # test_model.model_test(61, best_modelName, test_loader)
 
     if pretrained:
@@ -60,12 +62,13 @@ def model_test(nIndex, model_name, test_loader, pretrained):
     else:
         from net.ouy_net import Network
 
-    path = "./model_save/model_" + nIndex + "_save/"
-    model_path = path + model_name
+    # path = "./model_save/model_" + nIndex + "_save/"
+    # model_path = path + model_name
+    model_path = model_name
 
     print('model_path', model_path)
 
-    net = Network(nIndex)
+    net = Network(nIndex, use_spp)
     trained_model = os.path.join(model_path)
     load_net(trained_model, net)
     device = torch.device('cuda:0')
@@ -123,6 +126,9 @@ def model_test(nIndex, model_name, test_loader, pretrained):
 
     print('Accuracy:', accu)
 
+    if draw_pic:
+        sns.heatmap(matrix, annot=True)
+        plt.show()
     # sns.heatmap(matrix, annot=True)
     # plt.show()
 
@@ -140,6 +146,8 @@ if __name__ == '__main__':
     best_name = args.best_name
     test_batchsize = args.test_batchsize
     dataloader = args.dataloader
+    draw_pic = args.draw
+    draw_pic = True if draw_pic == 'True' else False
     if dataloader == 'zism_dataloader':
         from data_loader.zism_dataloader import TensorDataset
     elif dataloader == 'ouy_dataloader':
@@ -148,4 +156,4 @@ if __name__ == '__main__':
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=test_batchsize, pin_memory=True,
                                               num_workers=8)
 
-    model_test(nIndex, best_name, test_loader, pretrained)
+    model_test(nIndex, best_name, test_loader, pretrained, use_spp, draw_pic=draw_pic)

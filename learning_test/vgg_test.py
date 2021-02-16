@@ -73,6 +73,6 @@ class Vgg(nn.Module):
 
 if __name__ == '__main__':
     vgg = Vgg()
-    x = torch.randn(4, 3, 512, 512)
+    x = torch.randn(4, 3, 64, 64)
     out = vgg(x)
     print(out.shape)

@@ -99,9 +99,9 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
-        x = self.fc(x)
+        # x = self.avgpool(x)
+        # x = x.view(x.size(0), -1)
+        # x = self.fc(x)
         return x
 
 
@@ -122,6 +122,6 @@ if __name__ == '__main__':
     model = ResNet50()
     print(model)
 
-    input = torch.randn(1, 3, 224, 224)
+    input = torch.randn(1, 3, 64, 64)
     out = model(input)
     print(out.shape)

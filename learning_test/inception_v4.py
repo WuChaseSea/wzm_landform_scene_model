@@ -216,9 +216,9 @@ class InceptionV4(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        x = self.global_average_pooling(x)
-        x = x.view(x.size(0), -1)
-        x = self.linear(x)
+        # x = self.global_average_pooling(x)
+        # x = x.view(x.size(0), -1)
+        # x = self.linear(x)
         return x
 
 
@@ -226,6 +226,6 @@ if __name__ == '__main__':
     model = InceptionV4()
     # print(model)
 
-    input = torch.randn(4, 3, 512, 512)
+    input = torch.randn(4, 3, 64, 64)
     out = model(input)
     print(out.shape)

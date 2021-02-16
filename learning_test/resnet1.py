@@ -115,9 +115,9 @@ class ResNet(nn.Module):
         out = self.layer2(out)  # [16, 128, 64, 64]
         out = self.layer3(out)  # [16, 256, 32, 32]
         out = self.layer4(out)  # [16, 512, 16, 16]
-        out = F.avg_pool2d(out, 4)  # [16, 512, 4, 4]
-        out = out.view(out.size(0), -1)  # [16, 8192]
-        out = self.linear(out)  # [16, 3]
+        # out = F.avg_pool2d(out, 4)  # [16, 512, 4, 4]
+        # out = out.view(out.size(0), -1)  # [16, 8192]
+        # out = self.linear(out)  # [16, 3]
         return out
 
 
@@ -143,6 +143,6 @@ def ResNet152():
 
 if __name__ == '__main__':
     net = ResNet34()
-    y = net(torch.randn(1, 3, 512, 512), 3)
+    y = net(torch.randn(1, 3, 64, 64), 3)
     print(y.size())
 

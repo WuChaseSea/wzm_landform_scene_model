@@ -33,6 +33,12 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
     if dataloader == 'ouy_dataloader' and pretrained is True:
         from data_loader.ouy_dataloader import TensorDataset, save_net
         from net.ouy_net_pretrained import Network
+    if dataloader == 'ouy_dataloader64' and pretrained is False:
+        from data_loader.ouy_dataloader_64 import TensorDataset, save_net
+        from net.ouy_net import Network
+    if dataloader == 'ouy_dataloader64' and pretrained is True:
+        from data_loader.ouy_dataloader_64 import TensorDataset, save_net
+        from net.ouy_net_pretrained import Network
 
     train_loss_dict = {}
     valid_loss_dict = {}
@@ -236,9 +242,9 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
 
     accuracy_txt_output_dir = './model_save/model_%s_save' % index
     if pretrained is True:
-        accuracy_txt_output_name = dataloader_tmp + 'accuracy_loss_pretrained.txt'
+        accuracy_txt_output_name = dataloader_tmp + 'accuracy_pretrained.txt'
     else:
-        accuracy_txt_output_name = dataloader_tmp + 'accuracy_loss.txt'
+        accuracy_txt_output_name = dataloader_tmp + 'accuracy.txt'
     accuracy_txt_output_file = os.path.join(accuracy_txt_output_dir, accuracy_txt_output_name)
     with open(accuracy_txt_output_file, 'w') as fw_train:
         for epoch_key in accuracy_dict.keys():

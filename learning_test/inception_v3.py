@@ -277,12 +277,12 @@ class InceptionV3(nn.Module):
         # aux = x = self.block4(x)
         x = self.block4(x)
         x = self.block5(x)
-        x = self.max_pool(x)
-        x = self.dropout(x)
-        x = x.view(x.size(0), -1)
-        out = self.linear(x)
+        # x = self.max_pool(x)
+        # x = self.dropout(x)
+        # x = x.view(x.size(0), -1)
+        # out = self.linear(x)
 
-        return out
+        return x
 
         # if self.stage == 'train':
         #     aux = self.aux_logits(aux)
@@ -295,6 +295,6 @@ if __name__ == '__main__':
     model = InceptionV3()
     print(model)
 
-    input = torch.randn(16, 3, 128, 128)
+    input = torch.randn(16, 3, 64, 64)
     out = model(input)
     print(out.shape)

@@ -127,6 +127,7 @@ class DenseNet121(nn.Module):
     def __init__(self, num_classes=3):
         super(DenseNet121, self).__init__()
         self.net = DenseNet(init_channels=64, growth_rate=32, blocks=[6, 12, 24, 16])
+
         self.conv1_fusion = nn.Conv2d(3072, 256, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(256)
         self.relu1_fusion = nn.ReLU(inplace=True)
@@ -146,7 +147,7 @@ class DenseNet121(nn.Module):
 
         self.classifier = nn.Sequential(
             nn.Dropout(),
-            nn.Linear(64 * 4 * 4, 512),
+            nn.Linear(64 * 2 * 2, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(),
             nn.Linear(512, 256),
@@ -209,5 +210,6 @@ if __name__ == '__main__':
     model = DenseNet121()
     print(model)
 
-    out = model(torch.randn(8, 3, 128, 128),torch.randn(8, 1, 128, 128), torch.randn(8, 1, 128, 128))
+    # out = model(torch.randn(8, 3, 128, 128),torch.randn(8, 1, 128, 128), torch.randn(8, 1, 128, 128))
+    out = model(torch.randn(8, 3, 64, 64), torch.randn(8, 1, 64, 64), torch.randn(8, 1, 64, 64))
     print(out.shape)

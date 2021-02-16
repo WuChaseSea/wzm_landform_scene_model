@@ -235,17 +235,17 @@ class InceptionV2(nn.Module):
         x = self.block3(x)
         x = self.block4(x)
         x = self.block5(x)
-        x = self.max_pool(x)
-        x = self.dropout(x)
-        x = x.view(x.size(0), -1)
-        out = self.linear(x)
-        return out
+        # x = self.max_pool(x)
+        # x = self.dropout(x)
+        # x = x.view(x.size(0), -1)
+        # out = self.linear(x)
+        return x
 
 
 if __name__ == '__main__':
     model = InceptionV2()
     # print(model)
 
-    input = torch.randn(16, 3, 128, 128)
+    input = torch.randn(16, 3, 64, 64)
     out = model(input)
     print(out.shape)
