@@ -12,11 +12,13 @@ import torch.utils.model_zoo as model_zoo
 
 from models.spp_net import SpatialPyramidPooling2d
 
+from models.se_module import SELayer
+
 
 class VggModel(nn.Module):
 
     # Multi-column CNN
-    def __init__(self, num_classes=3, num_level=3, pool_type='max_pool', use_spp=False):
+    def __init__(self, num_classes=3, num_level=3, pool_type='max_pool', use_spp=False, use_se=False):
         super(VggModel, self).__init__()
         # pre = torch.load("vgg16-397923af.pth")
         # model = models.vgg16(pretrained=False)
@@ -31,6 +33,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(64, 128, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -39,6 +42,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(128, 256, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -50,6 +54,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(256, 512, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -61,6 +66,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(512, 512, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -73,6 +79,66 @@ class VggModel(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False)
         )
+        if use_se:
+            self.features1_se = nn.Sequential(
+                # [16, 3, 128, 128]
+                nn.Conv2d(3, 64, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(64, 64, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+
+                nn.Conv2d(64, 128, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(128, 128, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+
+                nn.Conv2d(128, 256, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(256, 256, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(256, 256, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+                SELayer(256),
+
+                nn.Conv2d(256, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+                SELayer(512),
+
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 128, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+                SELayer(128)
+            )
         self.features2 = nn.Sequential(
             nn.Conv2d(1, 64, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
@@ -82,6 +148,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(64, 128, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -90,6 +157,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(128, 256, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -101,6 +169,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(256, 512, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -112,6 +181,7 @@ class VggModel(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False),
+
             nn.Conv2d(512, 512, kernel_size=(3, 3),
                       stride=(1, 1), padding=(1, 1)),
             nn.ReLU(inplace=True),
@@ -124,6 +194,65 @@ class VggModel(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
                          dilation=1, ceil_mode=False)
         )
+        if use_se:
+            self.features2_se = nn.Sequential(
+                nn.Conv2d(1, 64, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(64, 64, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+
+                nn.Conv2d(64, 128, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(128, 128, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+
+                nn.Conv2d(128, 256, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(256, 256, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(256, 256, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+                SELayer(256),
+
+                nn.Conv2d(256, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+                SELayer(512),
+
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 128, kernel_size=(3, 3),
+                          stride=(1, 1), padding=(1, 1)),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0,
+                             dilation=1, ceil_mode=False),
+                SELayer(128)
+            )
         self.conv1_fusion = nn.Conv2d(384, 256, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(256)
         self.relu1_fusion = nn.ReLU(inplace=True)
@@ -152,6 +281,7 @@ class VggModel(nn.Module):
         )
 
         self.use_spp = use_spp
+        self.use_se = use_se
         if use_spp:
             self.num_level = num_level
             self.pool_type = pool_type
@@ -187,10 +317,16 @@ class VggModel(nn.Module):
         #     x1 = self.features1(x1)
         # else:
         #     x1 = self.features11(x1)
-        x1 = self.features1(x1)  # [16, 128, 4, 4]
+        if self.use_se:
+            x1 = self.features1_se(x1)  # [16, 128, 4, 4]
 
-        x2 = self.features2(x2)
-        x3 = self.features2(x3)
+            x2 = self.features2_se(x2)
+            x3 = self.features2_se(x3)
+        else:
+            x1 = self.features1(x1)  # [16, 128, 4, 4]
+
+            x2 = self.features2(x2)
+            x3 = self.features2(x3)
         x = torch.cat((x1, x2, x3), 1)
 
         h = self.conv1_fusion(x)

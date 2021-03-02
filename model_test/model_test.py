@@ -126,6 +126,17 @@ def model_test(nIndex, model_name, test_loader, pretrained, use_spp, draw_pic=Fa
 
     print('Accuracy:', accu)
 
+    matrix_file_path = os.path.split(best_name)[0]
+    matrix_file_path = os.path.join(matrix_file_path, 'confusion_matrix.txt')
+    with open(matrix_file_path, 'w') as fw_matrix:
+        for i in range(len(matrix)):
+            for j, num in enumerate(matrix[i]):
+                fw_matrix.write(str(num))
+                if j != len(matrix[i]) - 1:
+                    fw_matrix.write(' ')
+            fw_matrix.write('\n')
+    print('matrix txt finished writing...')
+
     if draw_pic:
         sns.heatmap(matrix, annot=True)
         plt.show()

@@ -51,6 +51,7 @@ def get_args():
     parser.add_argument("-pretrained", help="whether use pretrained model", type=str, default='False')
 
     parser.add_argument("-use_spp", help="whether use spp", type=str, default='False')
+    parser.add_argument("-use_se", help="whether use se", type=str, default='False')
 
     parser.add_argument("-train_batchsize", help="train batchsize", type=int, default=2)
     parser.add_argument("-valid_batchsize", help="valid batchsize", type=int, default=2)
@@ -73,6 +74,7 @@ if __name__ == '__main__':
     args = get_args()
     pretrained = args.pretrained
     use_spp = args.use_spp
+    use_se = args.use_spp
     if pretrained == 'False':
         pretrained = False
     else:
@@ -81,6 +83,7 @@ if __name__ == '__main__':
         use_spp = False
     else:
         use_spp = True
+    use_se = True if use_se == 'True' else False
     best_model = train(
         train_data_path=args.train_path,
         train_data_txt=args.train_txt,
@@ -90,6 +93,7 @@ if __name__ == '__main__':
         index=args.model,
         pretrained=pretrained,
         use_spp=use_spp,
+        use_se=use_se,
         train_batch_size=args.train_batchsize,
         valid_batch_size=args.valid_batchsize,
         epoches=args.epoches,

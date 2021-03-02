@@ -17,7 +17,7 @@ import global_models as gm
 def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, dataloader, index, pretrained,
           use_spp,
           train_batch_size,
-          valid_batch_size, epoches, save_epoch=5, valid_epoch=2):
+          valid_batch_size, epoches, use_se=False, save_epoch=5, valid_epoch=2):
     # print(torch.cuda.get_device_name(0))
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -209,6 +209,22 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
             log_text = 'BEST Precision: %0.4f, BEST MODEL: %s' % (best, best_model)
             # log_print(log_text, color='green', attrs=['bold'])
             print(log_text)
+
+        if epoch % 5 == 0:
+            dataloader_tmp = dataloader.split('_')[0] + '_'
+            accuracy_txt_output_dir = './model_save/model_%s_save' % index
+            if pretrained is True:
+                accuracy_txt_output_name = dataloader_tmp + 'accuracy_pretrained.txt'
+            else:
+                accuracy_txt_output_name = dataloader_tmp + 'accuracy.txt'
+            accuracy_txt_output_file = os.path.join(accuracy_txt_output_dir, accuracy_txt_output_name)
+            with open(accuracy_txt_output_file, 'w') as fw_train:
+                for epoch_key in accuracy_dict.keys():
+                    fw_train.write(epoch_key)
+                    fw_train.write('    ')
+                    fw_train.write(str(accuracy_dict[epoch_key]))
+                    fw_train.write('\n')
+            print('finished write accuracy file tmp.')
 
     dataloader_tmp = dataloader.split('_')[0] + '_'
 

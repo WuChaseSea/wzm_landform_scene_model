@@ -18,14 +18,14 @@ from models.ouy.ouy_densenet_model_pretrained import DenseNet121
 
 
 class Network(nn.Module):
-    def __init__(self, index, use_spp=False):
+    def __init__(self, index, use_spp=False, use_se=False):
         super(Network, self).__init__()
         self.index = index
         if index == 'Triple':
             self.Models = TripleModels(use_spp=use_spp)
             # print('Using TripleModels')
         elif index == 'VggNet':
-            self.Models = VggModel(use_spp=use_spp)
+            self.Models = VggModel(use_spp=use_spp, use_se=use_se)
             # print('Using VggModel')
         elif index == 'GoogLeNet':
             self.Models = InceptionV1(use_spp=use_spp)

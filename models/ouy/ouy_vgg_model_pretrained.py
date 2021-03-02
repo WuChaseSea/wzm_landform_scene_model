@@ -11,10 +11,11 @@ import torchvision.models as models
 import torch.utils.model_zoo as model_zoo
 
 from models.spp_net import SpatialPyramidPooling2d
+from models.se_module import SELayer
 
 
 class VggModel(nn.Module):
-    def __init__(self, num_classes=3, num_level=3, pool_type='max_pool', use_spp=False):
+    def __init__(self, num_classes=3, num_level=3, pool_type='max_pool', use_spp=False, use_se=False):
         super(VggModel, self).__init__()
         self.vgg = models.vgg16()  # vgg16模型
         del self.vgg.avgpool
@@ -39,6 +40,38 @@ class VggModel(nn.Module):
         # print(model_dicts.keys())
         self.vgg_1.load_state_dict(model_dicts)  # 加载更新后的自定义的网络模型参数
         # print(self.vgg_1.features)
+
+        self.use_se = use_se
+        if self.use_se:
+            self.vgg_se = nn.Sequential()
+            for i, fea in enumerate(self.vgg.features):
+                print(i, fea)
+                self.vgg_se.add_module(str(i), fea)
+                if i == 16:
+                    self.vgg_se.add_module('se1', SELayer(256))
+                if i == 23:
+                    self.vgg_se.add_module('se2', SELayer(512))
+                if i == 30:
+                    self.vgg_se.add_module('se3', SELayer(512))
+            model_dicts_se = self.vgg_se.state_dict()
+            pretrained_dicts_se = {k[9:]: v for k, v in origin_dicts.items() if k[9:] in model_dicts_se}
+            model_dicts_se.update(pretrained_dicts_se)
+            self.vgg_se.load_state_dict(model_dicts_se)
+
+            self.vgg_1_se = nn.Sequential()
+            for i, fea in enumerate(self.vgg_1.features):
+                print(i, fea)
+                self.vgg_1_se.add_module(str(i), fea)
+                if i == 16:
+                    self.vgg_1_se.add_module('se1', SELayer(256))
+                if i == 23:
+                    self.vgg_1_se.add_module('se2', SELayer(512))
+                if i == 30:
+                    self.vgg_1_se.add_module('se3', SELayer(512))
+            model_dicts_1_se = self.vgg_1_se.state_dict()
+            pretrained_dicts_1_se = {k[9:]: v for k, v in origin_dicts.items() if k[9:] in model_dicts_1_se}
+            model_dicts_1_se.update(pretrained_dicts_1_se)
+            self.vgg_1_se.load_state_dict(model_dicts_1_se)
 
         self.conv1_fusion = nn.Conv2d(1536, 256, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(256)
@@ -103,10 +136,16 @@ class VggModel(nn.Module):
         #     x1 = self.features1(x1)
         # else:
         #     x1 = self.features11(x1)
-        x1 = self.vgg.features(x1)  # [16, 128, 4, 4]
+        if self.use_se:
+            x1 = self.vgg_se.features(x1)  # [16, 128, 4, 4]
 
-        x2 = self.vgg_1.features(x2)
-        x3 = self.vgg_1.features(x3)
+            x2 = self.vgg_1_se.features(x2)
+            x3 = self.vgg_1_se.features(x3)
+        else:
+            x1 = self.vgg.features(x1)  # [16, 128, 4, 4]
+
+            x2 = self.vgg_1.features(x2)
+            x3 = self.vgg_1.features(x3)
         x = torch.cat((x1, x2, x3), 1)
 
         h = self.conv1_fusion(x)
