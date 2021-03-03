@@ -103,6 +103,7 @@ python achieve.py  后面需要加参数
 - -model 选择的模型文件，目前有Triple、VggNet、GoogLeNet、InceptionV2、InceptionV3、InceptionV4和ResNet34，默认ResNet34
 - -pretrained 是否需要使用预训练模型
 - -use_spp 是否使用spp结构，默认False不使用
+- -use_se 是否使用SE模块，需要注意的是目前只支持在VGG中使用该模块，默认为False，只有在使用VGGNet网络模型时设置为True才有用
 - -train_batchsize  训练时批处理的数目，默认1
 - -valid_batchsize  验证时批处理的数目，默认1
 - -epoches 迭代数，默认100
