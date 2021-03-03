@@ -69,6 +69,8 @@ class Network(nn.Module):
         # elif self.index == 'ResNet34':
         #     pre_label = self.Models(im_data, dem_data, img_data, 1)
         pre_label = self.Models(im_data, dem_data, img_data, 1)
+        if gt_data is None:
+            return pre_label
 
         gt_data = to_cuda(gt_data)
         gt_data = gt_data.view(-1)
