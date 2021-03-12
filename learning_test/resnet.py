@@ -123,5 +123,6 @@ if __name__ == '__main__':
     print(model)
 
     input = torch.randn(1, 3, 64, 64)
+    input.cuda()
     out = model(input)
     print(out.shape)

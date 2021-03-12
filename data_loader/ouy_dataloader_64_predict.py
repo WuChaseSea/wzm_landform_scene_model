@@ -52,7 +52,7 @@ class TensorDataset(Dataset):
     # 实现将一组Tensor数据对封装成Tensor数据集
     # 能够通过index得到数据集的数据，能够通过len，得到数据集大小
 
-    def __init__(self, data_path, data_name, shuffle=True):
+    def __init__(self, data_path, data_name, transform=False, shuffle=True):
         # self.data_tensor = data_tensor
         # self.target_tensor = target_tensor
         self.data_path = data_path

@@ -95,7 +95,7 @@ def model_test(nIndex, model_name, test_loader, pretrained, use_spp, test_path):
         num = len(label)
         for j in range(0, num):
             fw_predict.write(os.path.split(file_data[j])[1])
-            fw_predict.write("  ")
+            fw_predict.write(" ")
             fw_predict.write(str(label[j]))
             fw_predict.write("\n")
             aprelable.append(label[j])

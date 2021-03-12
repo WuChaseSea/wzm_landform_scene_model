@@ -43,7 +43,7 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
     train_loss_dict = {}
     valid_loss_dict = {}
     accuracy_dict = {}
-    train_data_loader_tmp = TensorDataset(train_data_path, train_data_txt)
+    train_data_loader_tmp = TensorDataset(train_data_path, train_data_txt, transform=True)
     weights = train_data_loader_tmp.getWeight()
     fw_train = open(os.path.join(train_data_path, train_data_txt), 'r')
     num_data_trains = len(fw_train.readlines())
@@ -52,11 +52,7 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
     train_data_loader = torch.utils.data.DataLoader(dataset=train_data_loader_tmp, batch_size=train_batch_size,
                                                     pin_memory=True, sampler=sampler, num_workers=0)
 
-    valid_data_loader_tmp = TensorDataset(valid_data_path, valid_data_txt)
-    valid_data_loader = torch.utils.data.DataLoader(dataset=valid_data_loader_tmp, batch_size=valid_batch_size,
-                                                    pin_memory=True, num_workers=0)
-
-    valid_data_loader_tmp = TensorDataset(valid_data_path, valid_data_txt)
+    valid_data_loader_tmp = TensorDataset(valid_data_path, valid_data_txt, transform=True)
     valid_data_loader = torch.utils.data.DataLoader(dataset=valid_data_loader_tmp, batch_size=valid_batch_size,
                                                     pin_memory=True, num_workers=0)
 

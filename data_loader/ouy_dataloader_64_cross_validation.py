@@ -52,11 +52,10 @@ class TensorDataset(Dataset):
     # 实现将一组Tensor数据对封装成Tensor数据集
     # 能够通过index得到数据集的数据，能够通过len，得到数据集大小
 
-    def __init__(self, data_path, data_name, transform=False, shuffle=True):
+    def __init__(self, data_path, X_data, y_data, transform=False, shuffle=True):
         # self.data_tensor = data_tensor
         # self.target_tensor = target_tensor
         self.data_path = data_path
-        self.data_name = data_name
         self.transform = transform
         # self.pre_load = pre_load
         # self.imresize = imresize;
@@ -66,21 +65,11 @@ class TensorDataset(Dataset):
         self.label = []
         self.weights = []
 
-        filename = os.path.join(data_path, data_name)
-        with open(filename, 'r') as file_to_read:
-            idx = 0
-            name = []
-            while True:
-                lines = file_to_read.readline()
-                if not lines:
-                    break
-                    pass
-                nameT, labelT = lines.split()
-                name.append(nameT)  # [0001_img.tiff,0002_img.tiff....]
-                path = os.path.join(data_path, nameT)
-                if os.path.isfile(path):
-                    self.data_files.append(path)
-                    self.label.append(labelT)  # [2,3,....]
+        for i in range(len(X_data)):
+            path = os.path.join(data_path, X_data[i])
+            if os.path.isfile(path):
+                self.data_files.append(path)
+                self.label.append(y_data[i])
         self.num_samples = len(self.data_files)
 
     def __getitem__(self, index):

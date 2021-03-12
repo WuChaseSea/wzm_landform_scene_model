@@ -5,7 +5,6 @@
 @function:  总实现文件
 """
 
-from model_train.train import train
 import global_models as gm
 import test as testmodel
 import os
@@ -25,8 +24,8 @@ gm.set_value('InceptionV4', 'InceptionV4')
 gm.set_value('ResNet34', 'ResNet34')
 gm.set_value('DenseNet121', 'DenseNet121')
 
-print("PyTorch Version: ", torch.__version__)
-print("Torchvision Version: ", torchvision.__version__)
+# print("PyTorch Version: ", torch.__version__)
+# print("Torchvision Version: ", torchvision.__version__)
 
 def return_args():
     args_list = sys.argv
@@ -53,6 +52,8 @@ def get_args():
     parser.add_argument("-use_spp", help="whether use spp", type=str, default='False')
     parser.add_argument("-use_se", help="whether use se", type=str, default='False')
 
+    parser.add_argument("-cross_validation", help="whether use k cross validation", type=str, default='False')
+
     parser.add_argument("-train_batchsize", help="train batchsize", type=int, default=2)
     parser.add_argument("-valid_batchsize", help="valid batchsize", type=int, default=2)
 
@@ -75,6 +76,7 @@ if __name__ == '__main__':
     pretrained = args.pretrained
     use_spp = args.use_spp
     use_se = args.use_spp
+    cross_validation = args.cross_validation
     if pretrained == 'False':
         pretrained = False
     else:
@@ -84,6 +86,11 @@ if __name__ == '__main__':
     else:
         use_spp = True
     use_se = True if use_se == 'True' else False
+    cross_validation = True if cross_validation == 'True' else False
+    if cross_validation:
+        from model_train.train_cross_validation import train
+    else:
+        from model_train.train import train
     best_model = train(
         train_data_path=args.train_path,
         train_data_txt=args.train_txt,

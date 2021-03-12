@@ -51,10 +51,12 @@ def get_args():
 
     parser.add_argument("-draw", help="whether draw pic", type=str, default='False')
 
+    parser.add_argument("-write", help="write result to txt", type=str, default='False')
+
     return parser.parse_args()
 
 
-def model_test(nIndex, model_name, test_loader, pretrained, use_spp, draw_pic=False):
+def model_test(nIndex, model_name, test_loader, pretrained, use_spp, draw_pic=False, write_result=False):
     # test_model.model_test(61, best_modelName, test_loader)
 
     if pretrained:
@@ -80,26 +82,35 @@ def model_test(nIndex, model_name, test_loader, pretrained, use_spp, draw_pic=Fa
     count = 0
     total = 0
     all_loader_length = len(test_loader)
+
+    fw_result = open('predict_result.txt', 'w')
+
     for i, blob in enumerate(test_loader):
         print("正在处理第 %d 个batch， 共 %d 个" % (i, all_loader_length))
         im_data = blob[0]
         dem_data = blob[2]
         img_data = blob[1]
         gt_data = blob[3].reshape((blob[3].shape[0], 1))
+        file_data = blob[4]
         index = 61
         pre_label = net(im_data, dem_data, img_data, index, gt_data)
         pre_label = pre_label.data.cpu().numpy()
 
         label = pre_label.argmax(axis=1).flatten()
         num = len(label)
-        for i in range(0, num):
-            if gt_data[i] == label[i]:
+        for j in range(0, num):
+            if gt_data[j] == label[j]:
                 count = count + 1
             total = total + 1
+            fw_result.write(os.path.split(file_data[j])[1])
+            fw_result.write(" ")
+            fw_result.write(str(label[j]))
+            fw_result.write("\n")
 
-            aprelable.append(label[i])
-            alable.append(gt_data[i])
+            aprelable.append(label[j])
+            alable.append(gt_data[j])
 
+    fw_result.close()
     # end=time.clock()
     # print (end-start)/300
     label_true = np.array(alable)
@@ -159,12 +170,16 @@ if __name__ == '__main__':
     dataloader = args.dataloader
     draw_pic = args.draw
     draw_pic = True if draw_pic == 'True' else False
+    write_result = args.write
+    write_result = True if write_result == 'True' else False
     if dataloader == 'zism_dataloader':
         from data_loader.zism_dataloader import TensorDataset
     elif dataloader == 'ouy_dataloader':
         from data_loader.ouy_dataloader import TensorDataset
+    elif dataloader == 'ouy_dataloader64':
+        from data_loader.ouy_dataloader_64 import TensorDataset
     test_dataset = TensorDataset(test_path, test_name)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=test_batchsize, pin_memory=True,
                                               num_workers=8)
 
-    model_test(nIndex, best_name, test_loader, pretrained, use_spp, draw_pic=draw_pic)
+    model_test(nIndex, best_name, test_loader, pretrained, use_spp, draw_pic=draw_pic, write_result=write_result)
