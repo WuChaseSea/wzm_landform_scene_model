@@ -21,6 +21,8 @@ ouy_dataloader：原始图像tiff格式，高程数据txt格式，山体阴影�
 
 zism_dataloader：图像jpg格式，高程数据txt格式，山体阴影数据txt格式，该数据原文中作者已提供，该项目中使用的进行处理过；
 
+ouy_dataloader64
+
 ## 项目介绍
 
 项目中含有使用预训练模型和不使用预训练模型两种的，所谓的使用预训练模型是加载那些经典网络在ImageNet数据集上的训练参数然后在自己的数据集上接着训练，而不是从头初始化再开始训练。
@@ -99,11 +101,12 @@ python achieve.py  后面需要加参数
 - -valid_path  验证集所在路径
 - -train_txt  训练集标签文件（该txt文件放在训练集里面，并且只要txt的文件名），默认train.txt
 - -valid_txt  验证集标签文件（该txt文件放在验证集里面，并且只要txt的文件名），默认valid.txt
-- -dataloader  需要加载的数据集格式，目前有ouy_dataloader和zism_dataloader两种格式，默认是zism_dataloader
+- -dataloader  需要加载的数据集格式，目前有ouy_dataloader和zism_dataloader、ouy_dataloader64种格式，默认是zism_dataloader
 - -model 选择的模型文件，目前有Triple、VggNet、GoogLeNet、InceptionV2、InceptionV3、InceptionV4和ResNet34，默认ResNet34
 - -pretrained 是否需要使用预训练模型
 - -use_spp 是否使用spp结构，默认False不使用
 - -use_se 是否使用SE模块，需要注意的是目前只支持在VGG中使用该模块，默认为False，只有在使用VGGNet网络模型时设置为True才有用
+- -cross_validation 是否使用k折交叉验证，目前使用该参数的话只支持ouy_dataloader64格式，默认False
 - -train_batchsize  训练时批处理的数目，默认1
 - -valid_batchsize  验证时批处理的数目，默认1
 - -epoches 迭代数，默认100
@@ -118,8 +121,16 @@ python model_test/model_test.py
 
 -model  选用的模型文件，默认值ResNet34
 
+-pretrainded 是否使用预训练模型， 默认False
+
+-use_spp  是否使用spp结构
+
 -best_name  使用的模型参数文件
 
 -dataloader  加载的数据集格式
 
 -test_batchsize  测试时批处理的数目，默认值8
+
+-draw 是否绘制混淆矩阵图
+
+-write 是否将结果写入txt文件中
