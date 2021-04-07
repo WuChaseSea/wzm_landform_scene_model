@@ -65,7 +65,7 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
     # elif index == 'ResNet34':
     #     print('Using ResNet34...')
     print('Using ' + gm.get_value(index) + '...')
-    net = Network(index=index, use_spp=use_spp, use_se=use_se)
+    net = Network(index=index, use_spp=use_spp)
     device = torch.device('cuda:0')
     if torch.cuda.is_available():
         net = net.to(device)
@@ -150,19 +150,41 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
 
         method, dataset_name = gm.get_value(index), dataloader.split('_')[0]
 
-        # if epoch % save_epoch == 0:  # 每5个epoch之后就保存一次模型
-        #     output_dir = './model_save/model_%s_save' % index
-        #     if not os.path.exists(output_dir):  # 如果目录不存在的话
-        #         # os.mkdir(output_dir)
-        #         os.makedirs(output_dir)
-        #     if pretrained is True:
-        #         filename = '{}_{}_{}_pretrained.h5'.format(dataset_name, method, epoch)
-        #     else:
-        #         filename = '{}_{}_{}.h5'.format(dataset_name, method, epoch)
-        #     save_name = os.path.join(output_dir, filename)
-        #     save_net(save_name, net)
+        if epoch % save_epoch == 0:  # 每5个epoch之后就保存一次模型
+            output_dir = './model_save/model_%s_save' % index
+            if not os.path.exists(output_dir):  # 如果目录不存在的话
+                # os.mkdir(output_dir)
+                os.makedirs(output_dir)
+            if pretrained is True:
+                filename = '{}_{}_{}_pretrained.h5'.format(dataset_name, method, epoch)
+            else:
+                filename = '{}_{}_{}.h5'.format(dataset_name, method, epoch)
+            save_name = os.path.join(output_dir, filename)
+            save_net(save_name, net)
 
         if epoch % valid_epoch == 0:  # 每5个epoch之后就保存一次模型并在验证集上测试一次
+            # method, dataset_name = gm.get_value(index), 'ouy'
+            # if index == 'Triple':
+            #     method = 'AlexNet'
+            #     dataset_name = 'ouy'
+            # elif index == 'VggNet':
+            #     method = 'VggNet'
+            #     dataset_name = 'ouy'
+            # elif index == 'GoogLeNet':
+            #     method = 'GoogLeNet_v1'
+            #     dataset_name = 'ouy'
+            # elif index == 'ResNet34':
+            #     method = 'ResNet34'
+            #     dataset_name = 'ouy'
+            # output_dir = './model_save/model_%s_save' % index
+            # if not os.path.exists(output_dir):  # 如果目录不存在的话
+            #     # os.mkdir(output_dir)
+            #     os.makedirs(output_dir)
+            # save_name = os.path.join(output_dir, '{}_{}_{}.h5'.format(method, dataset_name, epoch))
+            # save_net(save_name, net)
+            # calculate error on the validation dataset
+
+            # precision, valid_loss = evaluate_model(save_name, valid_data_loader, index)  # 100是传入这个模型的batchsize
             precision, valid_loss = evaluate_model1(net, valid_data_loader, index)
             valid_loss_dict[epoch_str] = valid_loss
             accuracy_dict[epoch_str] = precision
@@ -172,17 +194,6 @@ def train(train_data_path, train_data_txt, valid_data_path, valid_data_txt, data
                     best_model = '{}_{}_{}_pretrained.h5'.format(dataset_name, method, epoch)
                 else:
                     best_model = '{}_{}_{}.h5'.format(dataset_name, method, epoch)
-
-                output_dir = './model_save/model_%s_save' % index
-                if not os.path.exists(output_dir):  # 如果目录不存在的话
-                    # os.mkdir(output_dir)
-                    os.makedirs(output_dir)
-                if pretrained is True:
-                    filename = '{}_{}_{}_pretrained.h5'.format(dataset_name, method, epoch)
-                else:
-                    filename = '{}_{}_{}.h5'.format(dataset_name, method, epoch)
-                save_name = os.path.join(output_dir, filename)
-                save_net(save_name, net)
             # log_text = 'EPOCH: %d, load precision: %.4f, valid loss: %.4f, net precision: %.4f, net valid loss: %.4f' % (
             # epoch, precision, valid_loss, precision1, valid_loss1)
             # log_text = 'EPOCH: %d, precision: %.4f, valid loss: %.4f' % (epoch, precision, valid_loss)

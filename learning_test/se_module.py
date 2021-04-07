@@ -63,6 +63,6 @@ def se_inception_v3(**kwargs):
 
 if __name__ == '__main__':
     model = SEInception3(num_classes=3, aux_logits=False)
-    print(model)
+    # print(model)
     out = model(torch.randn(8, 3, 128, 128))
     print(out.shape)

@@ -45,7 +45,7 @@ class VggModel(nn.Module):
         if self.use_se:
             self.vgg_se = nn.Sequential()
             for i, fea in enumerate(self.vgg.features):
-                print(i, fea)
+                # print(i, fea)
                 self.vgg_se.add_module(str(i), fea)
                 if i == 16:
                     self.vgg_se.add_module('se1', SELayer(256))
@@ -60,7 +60,7 @@ class VggModel(nn.Module):
 
             self.vgg_1_se = nn.Sequential()
             for i, fea in enumerate(self.vgg_1.features):
-                print(i, fea)
+                # print(i, fea)
                 self.vgg_1_se.add_module(str(i), fea)
                 if i == 16:
                     self.vgg_1_se.add_module('se1', SELayer(256))

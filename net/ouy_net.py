@@ -15,6 +15,8 @@ from models.ouy.ouy_inception_v3_model import InceptionV3
 from models.ouy.ouy_inception_v4_model import InceptionV4
 from models.ouy.ouy_resnet_model import ResNet34
 from models.ouy.ouy_densenet_model import DenseNet121
+from models.ouy.wzm_improved_1 import WzmModel1
+from models.ouy.wzm_improved_2 import WzmModel2
 
 
 
@@ -46,6 +48,12 @@ class Network(nn.Module):
         elif index == 'DenseNet121':
             self.Models = DenseNet121(use_spp=use_spp)
             # print('Using DenseNet121')
+        elif index == 'WzmModel1':
+            self.Models = WzmModel1()
+            # print('Using WzmModel1')
+        elif index == 'WzmModel2':
+            self.Models = WzmModel2()
+            # print('Using WzmModel2')
         self.softmax = nn.LogSoftmax()
         self.loss_softmax = to_cuda(nn.CrossEntropyLoss())
 

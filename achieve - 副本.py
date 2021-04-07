@@ -23,8 +23,6 @@ gm.set_value('InceptionV3', 'InceptionV3')
 gm.set_value('InceptionV4', 'InceptionV4')
 gm.set_value('ResNet34', 'ResNet34')
 gm.set_value('DenseNet121', 'DenseNet121')
-gm.set_value('WzmModel1', 'WzmModel1')
-gm.set_value('WzmModel2', 'WzmModel2')
 
 # print("PyTorch Version: ", torch.__version__)
 # print("Torchvision Version: ", torchvision.__version__)
@@ -77,7 +75,7 @@ if __name__ == '__main__':
     args = get_args()
     pretrained = args.pretrained
     use_spp = args.use_spp
-    use_se = args.use_se
+    use_se = args.use_spp
     cross_validation = args.cross_validation
     if pretrained == 'False':
         pretrained = False
@@ -87,11 +85,7 @@ if __name__ == '__main__':
         use_spp = False
     else:
         use_spp = True
-    if use_se == 'False':
-        use_se = False
-    else:
-        use_se = True
-    # use_se = True if use_se == 'True' else False
+    use_se = True if use_se == 'True' else False
     cross_validation = True if cross_validation == 'True' else False
     if cross_validation:
         from model_train.train_cross_validation import train

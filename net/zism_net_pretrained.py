@@ -18,7 +18,7 @@ from models.zism.zism_densenet_model_pretrained import DenseNet121
 
 
 class Network(nn.Module):
-    def __init__(self, index):
+    def __init__(self, index, use_spp=False, use_se=False):
         super(Network, self).__init__()
         self.index = index
         if index == 'Triple':
